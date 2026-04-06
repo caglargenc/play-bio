@@ -164,9 +164,7 @@ function renderPublicationCard(item) {
         </div>
         <div class="pub-details">
           ${item.abstractFull ? `<p>${escapeHtml(item.abstractFull)}</p>` : ''}
-          ${item.projectTags ? `<p><strong>Project tags:</strong> ${escapeHtml(item.projectTags)}</p>` : ''}
           ${item.methodTags ? `<p><strong>Method tags:</strong> ${escapeHtml(item.methodTags)}</p>` : ''}
-          ${item.role ? `<p><strong>Role:</strong> ${escapeHtml(item.role)}</p>` : ''}
         </div>
       </div>
     </article>
