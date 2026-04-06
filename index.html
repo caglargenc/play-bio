@@ -1,10 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>PLAY-BIO Project</title>
+  <title>Play-Bio</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
 </head>
-<body>
-    <h1>Welcome to the PLAY-BIO Project</h1>
-    <p>This is our official website hosted via GitHub Pages.</p>
+<body data-page="home">
+  <section class="site-width header-container header-container--home">
+    <div class="logo--home-large">
+      <a href="index.html" aria-label="Play-Bio home">
+        <img src="images/Logo_with_text_transparent.png" alt="Play-Bio logo mark">
+      </a>
+    </div>
+
+    <div class="home-intro">
+      <nav id="nav" class="nav nav--home">
+        <a href="index.html" aria-current="page">About</a>
+        <a href="publications.html">Publications</a>
+        <a href="tools.html">Tools</a>
+      </nav>
+
+
+    </div>
+  </section>
+
+  <section class="site-width home-copy">
+    <div class="info-container">
+      <div class="info-content info-content--stacked">
+        <div class="text text--full">
+          <p>In a world where biomaterials—like <i>bacteria, yeast, mushrooms, and plants</i>—are often treated simply as “resources,” PLAY‑BIO invites us to imagine a different relationship with them. Instead of seeing these materials as things we extract and use, the project looks at them through <i>more‑than‑human</i> (MtH) perspectives, which encourage us to view nonhuman life as active participants in our world that we are connected to. Although designers and researchers have already explored biomaterials in many ways, we still get to understand more about how everyday engagements with them might support relations of care, connection, or kinship.</p>
+          <p><b>PLAY‑BIO</b> is funded by the Research Council of Finland and explores how <b><i>play</i></b> can help us build these new relationships. By focusing on fun, imagination, and joyful hands‑on engagement—not just utility—the project investigates how play can help people notice, care for, and relate to living materials as something more than objects “for us.” </p>
+          <p>To do this, PLAY‑BIO uses a hands‑on, design‑led approach that works directly with materials such as SCOBY (a culture of bacteria and yeast), mushroom‑based mycelium, and plant‑based biomaterials.  As a result, the project aims to create a practical guides that help designers and the other individuals explore how play can support more caring, imaginative, and respectful ways of living with the more‑than‑human world.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="site-width contact-strip">
+    <div class="contact-strip__inner">
+
+    <a href="https://www.instagram.com/playbio.design/" class="social-link social-link--instagram" target="_blank" rel="noreferrer" aria-label="Instagram">
+      <i class="bi bi-instagram" aria-hidden="true"></i>
+      <span>Instagram</span>
+    </a>
+            <a href="mailto:genc.caglar@tuni.fi" class="contact-email">Contact: genc.caglar@tuni.fi</a>
+    </div>
+  </section>
+
+  <section class="site-width recent-section">
+    <div class="section-width">
+
+      <div class="recent-carousel" data-carousel>
+        <button class="carousel-arrow carousel-arrow--left" type="button" data-carousel-prev aria-label="Previous">‹</button>
+        <div class="recent-carousel__viewport">
+          <div class="recent-carousel__track" data-carousel-track></div>
+        </div>
+        <button class="carousel-arrow carousel-arrow--right" type="button" data-carousel-next aria-label="Next">›</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="footer">
+    <div class="site-width footer-container">
+      <div class="footer-content footer-content--playbio">
+        <div class="footer-box footer-box--logo">
+          <img src="images/research-council-finland.png" alt="Research Council of Finland Logo">
+        </div>
+        <div class="footer-box footer-box--contact footer-box--right">
+          <p><strong>PI: Çağlar Genç</strong></p>
+          <p><a href="mailto:genc.caglar@tuni.fi">genc.caglar@tuni.fi</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="assets/js/site.js"></script>
 </body>
 </html>
