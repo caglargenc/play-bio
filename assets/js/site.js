@@ -21,18 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function initHome() {
   const outcomes = [];
 
-  // Add tools first
-  TOOLS.slice(0, 3).forEach(t => {
-    outcomes.push({
-      type: 'Tool',
-      title: t.title,
-      text: t.body,
-      image: t.image,
-      href: 'tools.html'
-    });
-  });
-
-  // Then add publications
+  // Add publications first
   try {
     const pubs = await loadPublications();
     pubs.slice(0, 3).forEach(p => {
@@ -47,6 +36,17 @@ async function initHome() {
   } catch (error) {
     console.error(error);
   }
+
+  // Then add tools
+  TOOLS.slice(0, 3).forEach(t => {
+    outcomes.push({
+      type: 'Tool',
+      title: t.title,
+      text: t.body,
+      image: t.image,
+      href: 'tools.html'
+    });
+  });
 
   renderCarousel(outcomes.slice(0, 6));
 }
