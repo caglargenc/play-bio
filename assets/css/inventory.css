@@ -76,12 +76,15 @@
 .inventory-card h3{margin:0;font-size:1rem;line-height:1.35}
 .quantity{flex:0 0 auto;min-width:42px;padding:6px 9px;border-radius:12px;background:var(--secondary-color);text-align:center;font-size:.75rem;font-weight:700}
 .quantity.is-empty{background:#f1e3e3;color:#7d3939}
-.location-pill{display:inline-flex;margin:9px 0 13px;padding:5px 8px;border-radius:8px;background:#fff1ce;color:#694900;font-size:.67rem;font-weight:700}
+.inventory-card__location{display:flex;flex-direction:column;align-items:flex-start;gap:7px;margin:9px 0 13px}
+.location-pill{display:inline-flex;padding:5px 8px;border-radius:8px;background:#fff1ce;color:#694900;font-size:.67rem;font-weight:700}
+.where-to-find{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;border:1px solid #000;border-radius:6px;padding:6px 10px;background:#000;color:#fff;font:700 .67rem/1.2 'Epilogue',sans-serif;cursor:pointer;transition:background .18s,color .18s,transform .18s}
+.where-to-find:hover,.where-to-find:focus-visible{background:#242424;color:#fff;outline:0}
 .inventory-card dl{display:grid;grid-template-columns:1fr 1fr;gap:10px 15px;margin:0}
 .inventory-card dt{margin:0 0 3px;color:rgba(35,31,32,.62);font-size:.65rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .inventory-card dd{margin:0;font-size:.76rem;line-height:1.45}
 .guidance-yes{color:#9a351e;font-weight:700}
 .empty-state{padding:50px 25px;text-align:center}
 .empty-state h3{margin:0 0 8px}.empty-state p{margin:0;line-height:1.6;color:rgba(35,31,32,.7)}
-@media(max-width:960px){.inventory-hero,.inventory-layout{grid-template-columns:1fr}.inventory-hero{gap:24px}.shelf-browser{order:1}.inventory-results{order:2;min-height:400px}.shelf-map{max-width:600px;margin-left:auto;margin-right:auto}.inventory-list{max-height:none}}
+@media(max-width:960px){.inventory-hero,.inventory-layout{grid-template-columns:1fr}.inventory-hero{gap:24px}.inventory-results{order:1;min-height:400px}.shelf-browser{order:2}.shelf-map{max-width:600px;margin-left:auto;margin-right:auto}.inventory-list{max-height:none}}
 @media(max-width:640px){.inventory-page{padding-top:18px}.inventory-search{height:56px;box-shadow:3px 3px 0 var(--inventory-ink)}.panel-heading{padding:20px 18px 15px}.shelf-map{width:calc(100% - 36px)}.shelf-help{margin-left:18px;margin-right:18px}.shelf-filters{padding:0 18px 20px}.inventory-list{padding:12px}.inventory-card dl{grid-template-columns:1fr}.availability-filter span{max-width:62px}.shelf-callout-label{font-size:clamp(.38rem,1.65vw,.58rem)}}

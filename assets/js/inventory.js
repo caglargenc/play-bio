@@ -59,6 +59,11 @@
     });
     stockCheckbox.addEventListener('change', render);
     list.addEventListener('click', event => {
+      const whereButton = event.target.closest('[data-action="where-to-find"]');
+      if (whereButton) {
+        showMaterialLocation(whereButton.dataset.materialLocation);
+        return;
+      }
       const button = event.target.closest('[data-location]');
       if (button && button.classList.contains('location-pill')) {
         toggleLocation(button.dataset.location);
@@ -157,6 +162,12 @@
     updateControls();
   }
 
+  function showMaterialLocation(location) {
+    selectedMaterialLocation = location;
+    updateControls();
+    document.querySelector('.shelf-browser')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   function restoreState() {
     const params = new URLSearchParams(window.location.search);
     searchInput.value = params.get('q') || '';
@@ -230,7 +241,10 @@
         <h3>${escapeHtml(item.item)}</h3>
         <span class="quantity${Number(item.quantity) === 0 ? ' is-empty' : ''}" title="Quantity">×${escapeHtml(item.quantity)}</span>
       </div>
-      <button class="location-pill" type="button" data-location="${escapeAttr(item.location)}" aria-label="Filter by ${escapeAttr(item.location)}">${escapeHtml(item.location)}</button>
+      <div class="inventory-card__location">
+        <button class="location-pill" type="button" data-location="${escapeAttr(item.location)}" aria-label="Filter by ${escapeAttr(item.location)}">${escapeHtml(item.location)}</button>
+        <button class="where-to-find" type="button" data-action="where-to-find" data-material-location="${escapeAttr(item.location)}" aria-label="Show where to find ${escapeAttr(item.item)}">Where to find</button>
+      </div>
       <dl>
         <div><dt>Used for material</dt><dd>${value(item.material)}</dd></div>
         <div><dt>Process</dt><dd>${value(item.process)}</dd></div>
