@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Material Inventory • Play-Bio</title>
+  <title>Material/Tool Inventory • Play-Bio</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Browse and search the Play-Bio biomaterials inventory by shelf, material, or process." />
+  <meta name="description" content="Find and browse Play-Bio materials and tools by name, shelf, use, or process." />
   <link rel="stylesheet" href="assets/css/main.css" />
-  <link rel="stylesheet" href="assets/css/inventory.css" />
+  <link rel="stylesheet" href="assets/css/inventory.css?v=8" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;700&family=Anton&display=swap" rel="stylesheet">
@@ -29,19 +29,34 @@
   <main class="site-width page-wrap inventory-page">
     <header class="inventory-hero">
       <div>
-        <p class="inventory-eyebrow">Play-Bio materials library</p>
-        <h1 class="section-title">Find a material</h1>
-        <p class="section-intro">Search the full inventory or explore a storage area. Every result includes its location, quantity, use, guidance requirements, and notes.</p>
+        <p class="inventory-eyebrow">Play-Bio materials and tools library</p>
+        <h1 class="section-title">Material/Tool Inventory</h1>
+        <p class="section-intro">Find a material or tool by searching the full inventory or exploring a storage area. Every result includes its location, quantity, use, guidance requirements, and notes.</p>
       </div>
       <label class="inventory-search">
-        <span class="sr-only">Search inventory</span>
+        <span class="sr-only">Search materials and tools</span>
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.6-4.6m2.6-5.4a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
-        <input id="inventory-search" type="search" placeholder="Try “agar”, “mycelium”, or “mixing”…" autocomplete="off">
+        <input id="inventory-search" type="search" placeholder="Try “agar”, “mould”, or “mixing tool”…" autocomplete="off">
         <button id="inventory-clear" type="button" aria-label="Clear search">×</button>
       </label>
     </header>
 
     <div class="inventory-layout">
+      <section class="inventory-results" aria-labelledby="results-heading">
+        <div class="panel-heading results-heading">
+          <div>
+            <p id="results-context" class="panel-kicker">All locations</p>
+            <h2 id="results-heading"><span id="result-count">0</span> materials/tools</h2>
+          </div>
+          <label class="availability-filter">
+            <input id="in-stock-only" type="checkbox">
+            <span>In stock only</span>
+          </label>
+        </div>
+        <div id="inventory-list" class="inventory-list" aria-live="polite"></div>
+        <noscript><p>Please enable JavaScript to browse the inventory.</p></noscript>
+      </section>
+
       <section class="shelf-browser" aria-labelledby="shelf-heading">
         <div class="panel-heading">
           <div>
@@ -52,27 +67,25 @@
         </div>
 
         <div class="shelf-map" id="shelf-map">
-          <img src="images/Shelves_color.png" alt="Illustration of the Play-Bio material shelves">
+          <img class="shelf-image shelf-image--base" src="images/Shelves_color.png" alt="Illustration of the Play-Bio material shelves">
+          <svg class="shelf-image-veil" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <filter id="shelf-spotlight-feather" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+                <feGaussianBlur stdDeviation="4.5" />
+              </filter>
+              <mask id="shelf-spotlight-mask">
+                <rect width="100" height="100" fill="white" />
+                <g id="shelf-spotlight-circles" filter="url(#shelf-spotlight-feather)"></g>
+              </mask>
+            </defs>
+            <rect class="shelf-image-dimmer" width="100" height="100" mask="url(#shelf-spotlight-mask)" />
+          </svg>
           <div id="shelf-hotspots" class="shelf-hotspots" aria-label="Shelf areas"></div>
         </div>
-        <p class="shelf-help">Select a highlighted area, or choose a location below.</p>
+        <p class="shelf-help">Hover over a shelf label to locate it, then select it to list its materials. Selecting a material highlights its shelf.</p>
         <div id="shelf-filters" class="shelf-filters" aria-label="Filter by shelf or drawer"></div>
       </section>
 
-      <section class="inventory-results" aria-labelledby="results-heading">
-        <div class="panel-heading results-heading">
-          <div>
-            <p id="results-context" class="panel-kicker">All locations</p>
-            <h2 id="results-heading"><span id="result-count">0</span> materials</h2>
-          </div>
-          <label class="availability-filter">
-            <input id="in-stock-only" type="checkbox">
-            <span>In stock only</span>
-          </label>
-        </div>
-        <div id="inventory-list" class="inventory-list" aria-live="polite"></div>
-        <noscript><p>Please enable JavaScript to browse the inventory.</p></noscript>
-      </section>
     </div>
   </main>
 
@@ -89,6 +102,6 @@
   </section>
 
   <script src="assets/js/inventory-data.js"></script>
-  <script src="assets/js/inventory.js"></script>
+  <script src="assets/js/inventory.js?v=8"></script>
 </body>
 </html>

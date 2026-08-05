@@ -10,29 +10,33 @@
   const stockCheckbox = document.getElementById('in-stock-only');
   const filters = document.getElementById('shelf-filters');
   const hotspots = document.getElementById('shelf-hotspots');
+  const shelfMap = document.getElementById('shelf-map');
   const list = document.getElementById('inventory-list');
   const count = document.getElementById('result-count');
   const context = document.getElementById('results-context');
   let selectedLocations = [];
+  let selectedMaterialLocation = '';
+  let hoveredAreaIndex = null;
 
   // Locations are grouped into the physical areas shown in the illustration.
   const shelfAreas = [
-    { label: 'Ingredients', short: 'Ingredients', locations: ['Biomaterial Ingredients'], x: 24, y: 10, w: 42, h: 13 },
-    { label: 'Samples & seeds', short: 'Samples', locations: ['Biomaterial Samples / Seeds'], x: 31, y: 25, w: 36, h: 12 },
-    { label: 'Sterile culture supplies', short: 'Sterile', locations: ['Sterile Culture Supplies', 'Sterile Culture Supplies / Filters', 'Sterile Culture Supplies / Syringes'], x: 27, y: 39, w: 41, h: 13 },
-    { label: 'Cleaning & safety', short: 'Safety', locations: ['Cleaning & Safety'], x: 34, y: 54, w: 33, h: 11 },
-    { label: 'Disposable supplies', short: 'Disposable', locations: ['Disposable & Consumables'], x: 21, y: 66, w: 28, h: 10 },
-    { label: 'Moulds & containers', short: 'Containers', locations: ['Moulds & Containers'], x: 48, y: 65, w: 29, h: 10 },
-    { label: 'Processing tools', short: 'Processing', locations: ['Processing Tools'], x: 23, y: 77, w: 48, h: 12 },
-    { label: 'Measuring tools', short: 'Measuring', locations: ['Measuring'], x: 23, y: 89, w: 21, h: 8 },
-    { label: 'Miscellaneous tools', short: 'Misc. tools', locations: ['Misc. Tools & Accs.'], x: 45, y: 89, w: 24, h: 8 },
-    { label: 'BioStuff', short: 'BioStuff', locations: ['BioStuff'], x: 70, y: 77, w: 10, h: 20 }
+    { label: 'Material Processing Tools', display: 'Material<br><strong>Processing <br>Tools</strong>', locations: ['Processing Tools'], line: '32,6.8 42,13', tx: 31, ty: 6, align: 'right'},
+    { label: 'Moulds & Containers', display: 'Moulds &amp;<br><strong>Containers</strong>', locations: ['Moulds & Containers'], line: '78,10 62,18.5', tx: 79, ty: 9.4, align: 'left'},
+    { label: 'Biomaterial Ingredients', display: 'Biomaterial<br><strong>Ingredients</strong>', locations: ['Biomaterial Ingredients'], line: '23,26 40,23', tx: 22, ty: 27, align: 'right'},
+    { label: 'Biomaterial Samples', display: 'Biomaterial<br><strong>Samples</strong>', locations: ['Biomaterial Samples / Seeds'], line: '22,44.5 40,35', tx: 21, ty: 45, align: 'right'},
+    { label: 'Sterile Culture Supplies', display: 'Sterile<br><strong>Culture <br>Supplies</strong>', locations: ['Sterile Culture Supplies', 'Sterile Culture Supplies / Filters', 'Sterile Culture Supplies / Syringes'], line: '81,30 62,30', tx: 82, ty: 30, align: 'left'},
+    { label: 'Cleaning & Safety', display: 'Cleaning &amp;<br><strong>Safety</strong>', locations: ['Cleaning & Safety'], line: '79,49 65,45', tx: 80, ty: 50, align: 'left'},
+    { label: 'Tools for Measuring', display: 'Tools for<br><strong>Measuring</strong>', locations: ['Measuring'], line: '77,62 63,52', tx: 78, ty: 66, align: 'left' },
+    { label: 'Miscellaneous Tools & Accessories', display: 'Misc.<br><strong>Tools &amp;<br> Accs.</strong>', locations: ['Misc. Tools & Accs.'], line: '17,73 30,72', tx: 16, ty: 73, align: 'right'},
+    { label: 'Bio-stuff', display: '<strong>Bio-stuff</strong>', locations: ['BioStuff'], line: '23,89 30,83', tx: 30, ty: 92, align: 'right'},
+    { label: 'Disposable & Consumables', display: 'Disposable &amp;<br><strong>Consumables</strong>', locations: ['Disposable & Consumables'], line: '58,92 53,83', tx: 63, ty: 96, align: 'center'}
   ];
 
   function init() {
     if (!list || !searchInput) return;
     renderFilters();
     renderHotspots();
+    bindSpotlight();
     restoreState();
     bindEvents();
     render();
@@ -47,6 +51,8 @@
     });
     showAllButton.addEventListener('click', () => {
       selectedLocations = [];
+      selectedMaterialLocation = '';
+      hoveredAreaIndex = null;
       searchInput.value = '';
       stockCheckbox.checked = false;
       render();
@@ -54,7 +60,19 @@
     stockCheckbox.addEventListener('change', render);
     list.addEventListener('click', event => {
       const button = event.target.closest('[data-location]');
-      if (button) toggleLocation(button.dataset.location);
+      if (button && button.classList.contains('location-pill')) {
+        toggleLocation(button.dataset.location);
+        return;
+      }
+      const card = event.target.closest('.inventory-card');
+      if (card) selectMaterialLocation(card.dataset.materialLocation);
+    });
+    list.addEventListener('keydown', event => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const card = event.target.closest('.inventory-card');
+      if (!card || event.target.closest('button')) return;
+      event.preventDefault();
+      selectMaterialLocation(card.dataset.materialLocation);
     });
   }
 
@@ -68,23 +86,75 @@
   }
 
   function renderHotspots() {
-    hotspots.innerHTML = shelfAreas.map((area, index) => `<button class="shelf-hotspot" type="button" data-area="${index}" data-short="${escapeAttr(area.short)}" aria-label="Show ${escapeAttr(area.label)}" aria-pressed="false" style="left:${area.x}%;top:${area.y}%;width:${area.w}%;height:${area.h}%"></button>`).join('');
+    const lines = shelfAreas.map((area, index) => {
+      const points = area.line.split(' ').map(point => point.split(',').map(Number));
+      const [start, end] = points;
+      return `<g class="shelf-callout-line" data-area="${index}"><line x1="${start[0]}" y1="${start[1]}" x2="${end[0]}" y2="${end[1]}"/><circle cx="${start[0]}" cy="${start[1]}" r=".7"/></g>`;
+    }).join('');
+    const labels = shelfAreas.map((area, index) => `<button class="shelf-callout-label is-${area.align}" type="button" data-area="${index}" aria-label="Show ${escapeAttr(area.label)}" aria-pressed="false" style="left:${area.tx}%;top:${area.ty}%">${area.display}</button>`).join('');
+    const shelfButtons = shelfAreas.map((area, index) => `<button class="shelf-hotspot" type="button" data-area="${index}" aria-label="Show ${escapeAttr(area.label)}" aria-pressed="false" style="left:${area.x}%;top:${area.y}%;width:${area.w}%;height:${area.h}%"></button>`).join('');
+    hotspots.innerHTML = `<svg class="shelf-callout-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>${labels}${shelfButtons}`;
     hotspots.addEventListener('click', event => {
       const button = event.target.closest('[data-area]');
       if (!button) return;
       const area = shelfAreas[Number(button.dataset.area)];
       const allSelected = area.locations.every(location => selectedLocations.includes(location));
+      selectedMaterialLocation = '';
       selectedLocations = allSelected ? selectedLocations.filter(location => !area.locations.includes(location)) : [...new Set([...selectedLocations, ...area.locations])];
       render();
       document.getElementById('results-heading').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
+    hotspots.addEventListener('pointerover', event => setCalloutHover(event.target.closest('[data-area]'), true));
+    hotspots.addEventListener('pointerout', event => {
+      const target = event.target.closest('[data-area]');
+      if (!target || event.relatedTarget?.closest?.(`[data-area="${target.dataset.area}"]`)) return;
+      setCalloutHover(target, false);
+    });
+  }
+
+  function bindSpotlight() {
+    updateSpotlights();
+  }
+
+  function updateSpotlights() {
+    if (!shelfMap) return;
+    const activeIndexes = shelfAreas.reduce((indexes, area, index) => {
+      const active = area.locations.some(location => location === selectedMaterialLocation)
+        || area.locations.every(location => selectedLocations.includes(location));
+      if (active) indexes.push(index);
+      return indexes;
+    }, []);
+    if (hoveredAreaIndex !== null && !activeIndexes.includes(hoveredAreaIndex)) activeIndexes.push(hoveredAreaIndex);
+
+    const circles = shelfMap.querySelector('#shelf-spotlight-circles');
+    if (!circles) return;
+    circles.replaceChildren();
+    activeIndexes.forEach(index => {
+      // The marker circle is drawn at the first point; reveal the opposite endpoint.
+      const end = shelfAreas[index].line.trim().split(/\s+/).at(-1).split(',').map(Number);
+      circles.insertAdjacentHTML('beforeend', `<ellipse class="shelf-spotlight-circle" cx="${end[0]}" cy="${end[1]}" rx="13" ry="11.28" fill="black"/>`);
+    });
+    shelfMap.classList.toggle('is-spotlight-visible', activeIndexes.length > 0);
+  }
+
+  function setCalloutHover(target, hovered) {
+    if (!target) return;
+    hotspots.querySelectorAll(`[data-area="${target.dataset.area}"]`).forEach(element => element.classList.toggle('is-hovered', hovered));
+    hoveredAreaIndex = hovered ? Number(target.dataset.area) : null;
+    updateSpotlights();
   }
 
   function toggleLocation(location) {
+    selectedMaterialLocation = '';
     selectedLocations = selectedLocations.includes(location)
       ? selectedLocations.filter(value => value !== location)
       : [...selectedLocations, location];
     render();
+  }
+
+  function selectMaterialLocation(location) {
+    selectedMaterialLocation = selectedMaterialLocation === location ? '' : location;
+    updateControls();
   }
 
   function restoreState() {
@@ -112,7 +182,7 @@
     updateUrl(query, inStockOnly);
 
     if (!shown.length) {
-      list.innerHTML = `<div class="empty-state"><h3>No materials found</h3><p>Try a broader word, clear the selected locations, or include out-of-stock materials.</p></div>`;
+      list.innerHTML = `<div class="empty-state"><h3>No materials or tools found</h3><p>Try a broader word, clear the selected locations, or include out-of-stock items.</p></div>`;
       return;
     }
 
@@ -132,10 +202,16 @@
     });
     document.querySelectorAll('[data-area]').forEach(button => {
       const area = shelfAreas[Number(button.dataset.area)];
-      const active = area.locations.every(location => selectedLocations.includes(location));
+      const active = area.locations.some(location => location === selectedMaterialLocation) || area.locations.every(location => selectedLocations.includes(location));
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    document.querySelectorAll('.shelf-callout-line').forEach(line => {
+      const area = shelfAreas[Number(line.dataset.area)];
+      line.classList.toggle('is-active', area.locations.some(location => location === selectedMaterialLocation) || area.locations.every(location => selectedLocations.includes(location)));
+    });
+    document.querySelectorAll('.inventory-card').forEach(card => card.classList.toggle('is-selected', card.dataset.materialLocation === selectedMaterialLocation));
+    updateSpotlights();
   }
 
   function updateUrl(query, inStockOnly) {
@@ -149,7 +225,7 @@
 
   function renderCard(item) {
     const guidance = normalize(item.guidance) === 'yes';
-    return `<article class="inventory-card">
+    return `<article class="inventory-card" data-material-location="${escapeAttr(item.location)}" tabindex="0" aria-label="Highlight shelf for ${escapeAttr(item.item)}">
       <div class="inventory-card__top">
         <h3>${escapeHtml(item.item)}</h3>
         <span class="quantity${Number(item.quantity) === 0 ? ' is-empty' : ''}" title="Quantity">×${escapeHtml(item.quantity)}</span>
